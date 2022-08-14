@@ -39,13 +39,6 @@ read.csv("https://ftp.sei.ba.gov.br/covid19/WesleyCota.csv", sep = ";") %>%
   select(-vaccinated_second, -vaccinated_single) %>% 
   write.csv("Vacinacao_Bahia.csv", row.names = F)
 
-date_pad = data.frame(date = c(as.Date("2021-01-01"),
-                               seq(as.Date("2021-01-17"), as.Date("2022-08-10"), 1)))
-
-dose_1 = Vacinas_BA %>% filter(dose == "2") %>% group_by(date) %>%
-  summarise(dose_2 = sum(count)) %>% 
-  mutate(date = as.Date(date), dose_2_acu = cumsum(dose_2))
-
 ## CASOS, OBITOS e RECUPERADOS
 
 setwd(paste0(getwd(), "/dados originais"))
@@ -72,9 +65,10 @@ DATA = COVID %>% group_by(data) %>% summarise(casos = sum(casosNovos)) %>%
   select(data) %>% tail(1) %>% data.frame()
 
 COVID %>% filter(estado != "", municipio == "", data == DATA$data, is.na(codmun)) %>% 
-  select(regiao, estado, coduf, pop = populacaoTCU2019, casos = casosAcumulado,
+  select(data, regiao, estado, coduf, pop = populacaoTCU2019, casos = casosAcumulado,
          obitos = obitosAcumulado) %>% 
-  mutate(casos_100k = casos*100000/pop, obitos_100k = obitos*100000/pop)
+  mutate(casos_100k = casos*100000/pop, obitos_100k = obitos*100000/pop) %>% 
+  write.csv("COVID_BR_Est.csv", row.names = F)
 
 # BAHIA
 
@@ -91,7 +85,7 @@ DATA = COVID %>% group_by(data) %>% summarise(casos = sum(casosNovos)) %>%
   select(data) %>% tail(1) %>% data.frame()
 
 COVID %>% filter(estado == "BA", municipio != "", data == DATA$data) %>%
-  select(municipio, codmun, pop = populacaoTCU2019, casos = casosAcumulado,
+  select(data, municipio, codmun, pop = populacaoTCU2019, casos = casosAcumulado,
          obitos = obitosAcumulado) %>% 
   mutate(casos_100k = casos*100000/pop, obitos_100k = obitos*100000/pop) %>% 
   write.csv("COVID_BA_Mun.csv", row.names = F)
