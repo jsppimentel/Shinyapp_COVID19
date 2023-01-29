@@ -28,7 +28,7 @@ F_NA = function(x){
 
 Vacinas_BR %>% mutate(total_vacinas = F_NA(total_vacinas), dose_1 = F_NA(dose_1),
                       dose_2 = F_NA(dose_2), dose_reforco = F_NA(dose_reforco)) %>%
-  write.csv("Vacinacao_Brasil.csv", row.names = F)
+  filter(date <= "2022-12-31") %>% write.csv("Vacinacao_Brasil.csv", row.names = F)
 
 # BAHIA
 
@@ -39,16 +39,16 @@ read.csv("https://ftp.sei.ba.gov.br/covid19/WesleyCota.csv", sep = ";") %>%
   select(-vaccinated_second, -vaccinated_single) %>% 
   write.csv("Vacinacao_Bahia.csv", row.names = F)
 
-## CASOS, OBITOS e RECUPERADOS
+## CASOS, OBITOS e RECUPERADOS - https://covid.saude.gov.br/
 
 setwd(paste0(getwd(), "/dados originais"))
 
-COVID = rbind(read.csv("COVID_2020_2022_AGOSTO (1).csv", sep = ";"), 
-              read.csv("COVID_2020_2022_AGOSTO (2).csv", sep = ";"),
-              read.csv("COVID_2020_2022_AGOSTO (3).csv", sep = ";"),
-              read.csv("COVID_2020_2022_AGOSTO (4).csv", sep = ";"),
-              read.csv("COVID_2020_2022_AGOSTO (5).csv", sep = ";"),
-              read.csv("COVID_2020_2022_AGOSTO (6).csv", sep = ";"))
+COVID = rbind(read.csv("COVID_2020_2022 (1).csv", sep = ";"), 
+              read.csv("COVID_2020_2022 (2).csv", sep = ";"),
+              read.csv("COVID_2020_2022 (3).csv", sep = ";"),
+              read.csv("COVID_2020_2022 (4).csv", sep = ";"),
+              read.csv("COVID_2020_2022 (5).csv", sep = ";"),
+              read.csv("COVID_2020_2022 (6).csv", sep = ";"))
 
 # BRASIL
 
@@ -57,7 +57,7 @@ COVID = rbind(read.csv("COVID_2020_2022_AGOSTO (1).csv", sep = ";"),
 COVID %>% filter(regiao == "Brasil") %>%
   select(data, casos = casosAcumulado, n_casos = casosNovos, 
          obitos = obitosAcumulado, n_obitos = obitosNovos) %>% 
-  write.csv("COVID_Brasil.csv", row.names = F)
+  filter(data <= "2022-12-31") %>% write.csv("COVID_Brasil.csv", row.names = F)
 
 ### DADOS TOTAIS POR ESTADO
 
@@ -68,7 +68,7 @@ COVID %>% filter(estado != "", municipio == "", data == DATA$data, is.na(codmun)
   select(data, regiao, estado, coduf, pop = populacaoTCU2019, casos = casosAcumulado,
          obitos = obitosAcumulado) %>% 
   mutate(casos_100k = casos*100000/pop, obitos_100k = obitos*100000/pop) %>% 
-  write.csv("COVID_BR_Est.csv", row.names = F)
+  filter(data <= "2022-12-31") %>% write.csv("COVID_BR_Est.csv", row.names = F)
 
 # BAHIA
 
@@ -77,7 +77,8 @@ COVID %>% filter(estado != "", municipio == "", data == DATA$data, is.na(codmun)
 COVID %>% filter(estado == "BA") %>% group_by(estado, data) %>% 
   summarise(casos = sum(casosAcumulado), n_casos = sum(casosNovos), 
             obitos = sum(obitosAcumulado), n_obitos = sum(obitosNovos)) %>%
-  data.frame() %>% select(-estado) %>% write.csv("COVID_BA.csv", row.names = F)
+  data.frame() %>% select(-estado) %>% filter(data <= "2022-12-31") %>% 
+  write.csv("COVID_BA.csv", row.names = F)
 
 ### DADOS TOTAIS POR MUNICIPIO
 
